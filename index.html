@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="shortcut icon" type="image/x-icon" href="image/icon.png">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+			integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+		<title>귀멸의 칼날 호흡 테스트</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-lg bg-body-tertiary active">
+			<div class="container-fluid nav-distance">
+			  <a class="navbar-brand" href="#">호흡법 테스트</a>
+			  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			  </button>
+			  <div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav">
+				  <li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="#">호흡법 테스트</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="#">미정</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link" href="#">미정</a>
+				  </li>
+				  <li class="nav-item">
+					<a class="nav-link disabled">미정</a>
+				  </li>
+				</ul>
+			  </div>
+			</div>
+		  </nav>
+		<section class="section">
+			<h1 class="title">귀멸의 칼날 호흡 테스트</h1>
+			<h2 class="subtitle pb-5">내가 만약 귀살대라면 나는 어떤 호흡을 쓸까?</h2>
+			<h5 class="reference_text">※ 스포일러 주의 ※<br>
+				애니를 보신 분들도 조금의 스포를 당할 수 있고,<br>
+				실제사람을 보며 학습시킨것이 아니기 때문에<br>
+				매번 다른 결과가 나올 수 있으므로 재미로만 봐주세요!!
+			</h5>
+		</section>
+		<script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<div class="container file-upload">
+			<div class="image-upload-wrap" style="margin: 0 auto;">
+				<input class="file-upload-input" type="file" onchange="readURL(this);" accept="image/*" />
+				<div class="drag-text">
+					<img src="image/upload.png" class="mt-5 pt-5 upload-img" style="width:20%;">
+					<h3 class="mb-5 pb-5 pt-3 upload-text">얼굴 사진을 넣어주세요!</h3>
+				</div>
+			</div>
+			<div class="file-upload-content">
+				<img class="file-upload-image" id="face-image" src="#" alt="your image" />
+				<!-- 이위치에 결과의 따른 사진 -->
+				<div id="loading" class="" style="display: none;">
+					<div class="spinner-grow text-danger" role="status">
+						<span class="sr-only"></span>
+					</div>
+					<p class="font_style">인공지능이 당신의 얼굴을 분석중입니다...</p>
+				</div>
+				<p class="result_title"></p>
+				<div id="label-container"></div>
+				<div class="image-title-wrap"> <!--다 만든 후 이버튼을 누르면 다시 할수 있게 수정 -->
+					<button type="button" onclick="removeUpload()" class="try_button">
+						<span class="button_text font_style">다른 사진으로 재시도</span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div id="webcam-container"></div>
+
+		<div class="pt-5 develop font_style">
+			<p class="">제작 도움</p>
+			<a href="https://www.youtube.com/@jocoding">Jocoding Youtube</a>
+			<br>
+			<a href="https://teachablemachine.withgoogle.com/">teachablemachine</a>
+			<br>
+			<a href="https://getbootstrap.kr/" class="pb-5 mb-5">bootstrap</a>
+		</div>
+		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+			integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+			crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+			integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+			crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+		<script>
+			function readURL(input) {
+				if (input.files && input.files[0]) {
+
+					var reader = new FileReader();
+
+					reader.onload = function (e) {
+						$('.image-upload-wrap').hide();
+						$('#loading').show();
+						$('.file-upload-image').attr('src', e.target.result);
+						$('.file-upload-content').show();
+						$('.image-title').html(input.files[0].name);
+					};
+					reader.readAsDataURL(input.files[0]);
+					init().then(function(){
+						predict()
+						$('#loading').hide();
+					})
+				} else {
+					removeUpload();
+				}
+			}
+
+			function removeUpload() {
+				$('.file-upload-input').replaceWith($('.file-upload-input').clone());
+				$('.file-upload-content').hide();
+				$('.image-upload-wrap').show();
+			}
+			$('.image-upload-wrap').bind('dragover', function () {
+				$('.image-upload-wrap').addClass('image-dropping');
+			});
+			$('.image-upload-wrap').bind('dragleave', function () {
+				$('.image-upload-wrap').removeClass('image-dropping');
+			});
+
+		</script>
+		<script type="text/javascript">
+			// More API functions here:
+			// https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+			// the link to your model provided by Teachable Machine export panel
+			const URL = 'https://teachablemachine.withgoogle.com/models/Kc5C7_Pcf/';
+
+			let model, webcam, labelContainer, maxPredictions;
+
+			// Load the image model and setup the webcam
+			async function init() {
+				const modelURL = URL + 'model.json';
+				const metadataURL = 'metadata.json';
+
+				// load the model and metadata
+				// Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+				// or files from your local hard drive
+				// Note: the pose library adds "tmImage" object to your window (window.tmImage)
+				model = await tmImage.load(modelURL, metadataURL);
+				maxPredictions = model.getTotalClasses();
+				labelContainer = document.getElementById('label-container');
+				for (let i = 0; i < maxPredictions; i++) {
+					// and class labels
+					labelContainer.appendChild(document.createElement('div'));
+				}
+			}
+
+			// run the webcam image through the image model
+			async function predict() {
+				// predict can take in an image, video or canvas html element
+				var image = document.getElementById('face-image')
+				const prediction = await model.predict(image, false);
+				prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
+				var result_title;
+				var result_messege;
+				var result_breath_user;
+				switch(prediction[0].className)
+				{
+					case "Fire":
+						result_title = "당신은 화염의 호흡 사용자!"
+						result_messege = "당신은 정열을 가슴에 품고 목표를 향해 나아가면서 사소한 일에 연연하지 않는 타입의 사람입니다!<br>당신은 주변 사람들과 있을때 분위기를 주도하거나 밝게 유도해 사람들에게 인기가 많을 확률이 높습니다!"
+						result_breath_user = "사용자: 렌고쿠 쿄쥬로, 렌고쿠 신쥬로"
+						break;
+					case "Fog" :
+						result_title = "당신은 안개의 호흡 사용자!"
+						result_messege = "당신은 평소 겉으로 감정을 표출하지 않는 사람입니다!<br>감정을 밖으로 표출하지 않아 부정적인 감정들이 쌓여있을 수 있습니다 불편한게 있으면 참지 마시고 감정을 표출해보세요!"
+						result_breath_user = "사용자: 토키토 무이치로"
+						break;
+					case "Snake":
+						result_title = "당신은 뱀의 호흡 사용자!"
+						result_messege = "당신은 남들이 보기에 까칠하고 다가가기 힘들어 보일수도 있는 타입의 사람입니다!<br>실제로는 누구보다 샹낭하고 남을 챙기는 따뜻한 마음씨를 가슴속에 숨기고 있으니 타인과의 관계를 두려워하지말고 자신의 마음을 솔직하게 표현해보는것은 어떨까요?"
+						result_breath_user = "사용자: 이구로 오바나이"
+						break;
+					case "Flower":
+						result_title = "당신은 꽃의 호흡 사용자!" 
+						result_messege = "당신은 상냥하고 선한 마음을 가지고 있는 사람입니다!<br>당신은 소외된 사람이 있다면 먼저 다가가 말을 걸어 친하게 지내고 존재 자체만으로도 주변 사람들에게 선한 영향력과 긍정적 에너지를 주는 사람일 가능성이 높습니다!"
+						result_breath_user = "사용자: 코쵸우 카나에, 츠유리 카나오"
+						break;
+					case "Lightning":
+						result_title = "당신은 번개의 호흡 사용자!"
+						result_messege = "당신은 자신의 이성을 가감없이 드러내고 집념이 강한 사람입니다!<br>막중한 책임감을 가지고 있고 주변 사람들을 아끼며 해야할 일에 있어 어떠한 노력도 서슴치 않을 가능성이 높습니다!"
+						result_breath_user = "사용자: 쿠와지마 지고로, 젠이츠, 카이가쿠"
+						break;
+					case "Water" :
+						result_title = "당신은 물의 호흡 사용자!"
+						result_messege = "당신은 침착하고 유연한 사고를 가진 사람입니다!<br>당신의 차분함은 남들에게 차가운 사람으로 보이기 쉽지만, 당신의 그러한 성격이 언젠가는 모두를 감싸는 따뜻한 포용이라는것을 주변인들이 알게 될것이니 너무 걱정하지 마세요!"
+						result_breath_user = "사용자: 우로코다키, 기유, 사비토, 마코모, 탄지로 등"
+						break;
+					case "Moon" :
+						result_title = "당신은 달의 호흡 사용자!"
+						result_messege = "당신은 고결함과 고상함을 추구하는 사람입니다!<br>태양과 같이 언제나 빛나지는 않지만 달과 같이 은은하게 빛나는 모습이 당신을 더욱 매력적으로 만들어줄것입니다. 하지만 조심하세요! 당신의 고결함은 남과 비교하기 위한 우월함이 아니라 남을 이끌기 위함이라는것을요."
+						result_breath_user = "사용자: 코쿠시보"
+						break;
+					case "Sun" :
+						result_title = "당신은 해의 호흡 사용자!"
+						result_messege = "당신은 강인하고 태양과같이 모두의 중심이 되는 사람입니다!<br>많은 사람들이 당신에게 의존할 수 있어 때때로는 부담감과 상처를 숨겨야 할때도 있을것입니다. 가끔씩은 마음의 짐을 내려놓고 자신만의 쉬는시간을 가져보는것은 어떨까요?"
+						result_breath_user = "사용자: 요리이치, 탄지로"
+						break;
+					case "Beast":
+						result_title = "당신은 짐승의 호흡 사용자!"
+						result_messege = "당신은 숨김이 없고 자유분방한 사람입니다!<br>당신의 자유로움은 타인에게 낯설게 느껴질 수 있지만, 당신의 티 없이 맑은 성격은 언젠가 타인마저 순수하게 만들어 버릴 것이니 자신을 잃지 말고 막힘없이 나아가세요!"
+						result_breath_user = "사용자: 하시바라 이노스케"
+						break;
+					case "Rock" :
+						result_title = "당신은 바위의 호흡 사용자!"
+						result_messege = "당신은 다른 사람에 대해 매우 공감하고 동정심이 깊은 사람입니다!<br>당신은 정의심이 강하고 도움이 필요한 사람들이나 다른 약자들에게 항상 기꺼이 도움의 손길을 내주는 온화한 사람이라고 할 수 있죠!"
+						result_breath_user = "사용자: 히메지마 교메이"
+						break;
+					case "Love":
+						result_title = "당신은 사랑의 호흡 사용자!"
+						result_messege = "당신은 에너지가 넘치고 외향적인 사람입니다!<br>당신의 열정적이고 사랑스러운 모습은 많은 사람에게 힘이 될 수도 있습니다. 하지만 당신의 넘치는 매력은 당신의 본심마저 가려버릴 수도 있으니 때때로는 자신의 솔직한 마음이 무엇인지 생각해 보는 것은 어떨까요?"
+						result_breath_user = "사용자: 칸로지 미츠리"
+						break;
+					case "Wind":
+						result_title = "당신은 바람의 호흡 사용자!"
+						result_messege = "당신은 자신보다 남을 위하고 궂은 일도 마다하지 않는 사람입니다!<br>자신의 배려를 표현할 때 표현하는 방법이 상대방이 간혹 오해를 부를 수 있을 수 있으니 좀 더 진심으로 솔직하게 표현하는 게 좋습니다!"
+						result_breath_user = "사용자: 시나즈가와 사네미, 쿠메노 마사치카"
+						break;
+					case "Sound":
+						result_title = "당신은 소리의 호흡 사용자!"
+						result_messege = "당신은 화려하고 매력이 넘치는 사람입니다!<br>당신은 주변인들로부터 시기와 질투를 받을 수 있으나 당신의 가슴 깊은 곳부터 넘쳐흐르는 올곧은 매력은 언젠가는 그들도 홀려버릴 것이니 걱정하지 말고 당신의 매력을 마음껏 뽐내주세요!"
+						result_breath_user = "사용자: 우즈이 텐겐"
+						break;
+					case "Insect":
+						result_title = "당신은 벌레의 호흡 사용자!"
+						result_messege = "당신은 우아하고 아름다운 사람입니다!<br>나비의 날개짓과 같은 당신의 아름다운 행동의 이면에는 상처가 있기 마련입니다. 텅빈 아름다움을 추구하는것 보다는 진실된 행동으로 진정한 아름다움을 알아가는것을 시작해보면 어떨까요?"
+						result_breath_user = "사용자: 코쵸우 시노부"
+						break;
+					default :
+						result_title = "알수없음"
+						result_messege = "알수없음"
+						result_breath_user = "알수없음"
+				}
+				var title = "<div class='"+prediction[0].className+"-breath-title font_style'>"+result_title+"</div>"
+				var messege = "<div class='breath-messege pt-2 font_style'>"+result_messege+"</div>"
+				var breath_user = "<div class ='"+prediction[0].className+"-breath-user font_style'>"+result_breath_user+"</div>"
+				$('.result_title').html(title+messege+breath_user);
+					// const classPrediction =
+					// 	prediction[0].className + ': ' + prediction[0].probability.toFixed(2)*100+"%";
+					// labelContainer.childNodes[0].innerHTML = classPrediction;
+			}
+		</script>
+	</body>
+<!-- Copyright (c) 2023 by Aaron Vanston (https://codepen.io/aaronvanston/pen/yNYOXR)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
+
+<!--font link : http://levelup.nexon.com/font/index.aspx-->
+
+</html>
