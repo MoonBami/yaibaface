@@ -146,14 +146,14 @@ body {
   }
 
   .section {
-    margin-top: 50px;
+    margin-top: 100px;
   }
 
   .title {
     font-family: "maple_font_bold";
     line-height: 1.67;
     text-align: center;
-    color: #202124;
+    color: #393e46;
     margin-bottom: 0px;
   }
 
@@ -161,7 +161,7 @@ body {
     
     line-height: 1.53;
     text-align: center;
-    color: #202124;
+    color: #393e46;
     padding-bottom: 1.5%;
   }
   

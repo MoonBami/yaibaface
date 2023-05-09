@@ -27,9 +27,6 @@
 				  <li class="nav-item">
 					<a class="nav-link" href="#">미정</a>
 				  </li>
-				  <li class="nav-item">
-					<a class="nav-link disabled">미정</a>
-				  </li>
 				</ul>
 			  </div>
 			</div>
@@ -63,8 +60,13 @@
 				</div>
 				<p class="result_title"></p>
 				<div id="label-container"></div>
+				<ul class="sns">
+					<li class="kakaotalk">
+					<a href="#n" id="btnKakao" onclick="fn_sendFB('kakaotalk');return false;" class="kakaotalk" target="_self" title="카카오톡 새창열림"><span class="skip">카카오톡</span></a>
+					</li>
+				</ul>				  
 				<div class="image-title-wrap"> <!--다 만든 후 이버튼을 누르면 다시 할수 있게 수정 -->
-					<button type="button" onclick="removeUpload()" class="try_button">
+					<button type="button" onclick="gaReload()" class="try_button">
 						<span class="button_text font_style">다른 사진으로 재시도</span>
 					</button>
 				</div>
@@ -72,14 +74,20 @@
 		</div>
 		<div id="webcam-container"></div>
 
-		<div class="pt-5 develop font_style">
-			<p class="">제작 도움</p>
-			<a href="https://www.youtube.com/@jocoding">Jocoding Youtube</a>
-			<br>
-			<a href="https://teachablemachine.withgoogle.com/">teachablemachine</a>
-			<br>
-			<a href="https://getbootstrap.kr/" class="pb-5 mb-5">bootstrap</a>
-		</div>
+		<footer class="mt-5 develop font_style">
+			<div>
+				<p class="">제작 도움</p>
+				<p><a href="https://www.youtube.com/@jocoding">Jocoding Youtube</a></p>
+				<p><a href="https://teachablemachine.withgoogle.com/">teachablemachine</a></p>
+				<p><a href="https://getbootstrap.kr/">bootstrap</a></p>
+			</div>
+		</footer>
+		<script>
+			function gaReload()
+			{
+				window.location.reload();
+			}
+		</script>
 		<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
 			integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
 			crossorigin="anonymous"></script>
@@ -87,8 +95,34 @@
 			integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
 			crossorigin="anonymous"></script>
 		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-		<script
-			src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+		<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+		<script >
+			function fn_sendFB(sns) {
+			var thisUrl = document.URL;
+			var snsTitle = "2021 웹진 [봄]";
+			 
+			if( sns == 'kakaotalk' ) {
+				// 사용할 앱의 JavaScript 키 설정
+				Kakao.init('b0e5f4235c338fe0c188c214addf8739');
+				
+				// 카카오링크 버튼 생성
+				Kakao.Link.createDefaultButton({
+					container: '#btnKakao', // HTML에서 작성한 ID값
+					objectType: 'feed',
+					content: {
+					title: "2021 웹진 [봄]", // 보여질 제목
+					description: "2021 웹진 [봄]", // 보여질 설명
+					imageUrl: thisUrl, // 콘텐츠 URL
+					link: {
+						mobileWebUrl: thisUrl,
+						webUrl: thisUrl
+					}
+					}
+				});
+			}
+		}
+		</script>			
 		<script>
 			function readURL(input) {
 				if (input.files && input.files[0]) {
