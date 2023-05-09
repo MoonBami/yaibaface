@@ -60,12 +60,10 @@
 				</div>
 				<p class="result_title"></p>
 				<div id="label-container"></div>
-				<ul class="sns">
-					<li class="kakaotalk">
-					<a href="#n" id="btnKakao" onclick="fn_sendFB('kakaotalk');return false;" class="kakaotalk" target="_self" title="카카오톡 새창열림"><span class="skip">카카오톡</span></a>
-					</li>
-				</ul>				  
-				<div class="image-title-wrap"> <!--다 만든 후 이버튼을 누르면 다시 할수 있게 수정 -->
+				<div class="sns">
+					<a role="button" href="#n" class="kakaotalk" id="btnKakao" onclick="fn_sendFB('kakaotalk');return false;" target="_self" title="카카오톡 새창열림"><span class="skip">카카오톡</span></a>
+				</div>				  
+				<div class="pt-3 image-title-wrap"> <!--다 만든 후 이버튼을 누르면 다시 할수 있게 수정 -->
 					<button type="button" onclick="gaReload()" class="try_button">
 						<span class="button_text font_style">다른 사진으로 재시도</span>
 					</button>
@@ -100,7 +98,7 @@
 		<script >
 			function fn_sendFB(sns) {
 			var thisUrl = document.URL;
-			var snsTitle = "2021 웹진 [봄]";
+			var snsTitle = "호흡법 테스트";
 			 
 			if( sns == 'kakaotalk' ) {
 				// 사용할 앱의 JavaScript 키 설정
@@ -111,8 +109,8 @@
 					container: '#btnKakao', // HTML에서 작성한 ID값
 					objectType: 'feed',
 					content: {
-					title: "2021 웹진 [봄]", // 보여질 제목
-					description: "2021 웹진 [봄]", // 보여질 설명
+					title: "귀멸의 칼날 호흡법 테스트", // 보여질 제목
+					description: "내가 만약 귀살대라면 무슨 호흡을 사용할까?", // 보여질 설명
 					imageUrl: thisUrl, // 콘텐츠 URL
 					link: {
 						mobileWebUrl: thisUrl,
