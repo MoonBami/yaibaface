@@ -451,3 +451,9 @@ body {
     margin-right: 5px;
     padding: 5px;
   }
+
+  .ad_banner
+  {
+    width: 320px;
+    margin: 0 auto;
+  }
